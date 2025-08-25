@@ -20,15 +20,11 @@ func CreateServer(logger *log.Logger) (*routerData, error) {
 
 func registerHandlers() {
 	http.Handle("/", http.FileServer(http.Dir("web")))
-	// http.HandleFunc("/", handlers.Main)
-	// http.HandleFunc("/js/scripts.min.js", handlers.ScriptMinJs)
-	// http.HandleFunc("/css/style.css", handlers.StyleCss)
-	// http.HandleFunc("/favicon.ioc", handlers.FaviconIco)
 }
 
 func newRouterData(logger *log.Logger) *routerData {
-	todoPort := os.Getenv("TODO_PORT")
-	if todoPort == "" {
+	todoPort := ":" + os.Getenv("TODO_PORT")
+	if todoPort == ":" {
 		todoPort = ":7540"
 	}
 
