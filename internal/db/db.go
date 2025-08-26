@@ -18,7 +18,11 @@ const schema = "CREATE TABLE scheduler (" +
 var db *sql.DB
 
 func Init(dbFiles string) error {
-	dbFile := "scheduler.db"
+	dbFile := os.Getenv("TODO_DBFILE")
+	if dbFile == "" {
+		dbFile = "scheduler.db"
+	}
+
 	_, err := os.Stat(dbFile)
 
 	var install bool
