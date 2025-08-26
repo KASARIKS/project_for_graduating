@@ -7,8 +7,10 @@ import (
 	"time"
 )
 
+const DateFormat = "20060102"
+
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {
-	dstartTime, err := time.Parse("20060102", dstart)
+	date, err := time.Parse(DateFormat, dstart)
 	if err != nil {
 		return "", err
 	}
@@ -16,12 +18,12 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		return "", err
 	}
 
-	countedTime, err := countNextDate(now, dstartTime, repeat)
+	countedTime, err := countNextDate(now, date, repeat)
 	if err != nil {
 		return "", err
 	}
 
-	return countedTime.Format("20060102"), nil
+	return countedTime.Format(DateFormat), nil
 }
 
 func validateRepeatParam(repeat string) error {
@@ -70,11 +72,15 @@ func countNextDate(now time.Time, dstartTime time.Time, repeat string) (time.Tim
 			return time.Time{}, err
 		}
 
-		for dstartTime.Before(now) {
+		dstartTime = dstartTime.AddDate(0, 0, daysQuantity)
+
+		for !dstartTime.AddDate(1, 0, 0).After(now) {
 			dstartTime = dstartTime.AddDate(0, 0, daysQuantity)
 		}
 	case 'y':
-		for dstartTime.Before(now) {
+		dstartTime = dstartTime.AddDate(1, 0, 0)
+
+		for !dstartTime.AddDate(1, 0, 0).After(now) {
 			dstartTime = dstartTime.AddDate(1, 0, 0)
 		}
 	}
