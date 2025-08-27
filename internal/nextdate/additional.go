@@ -33,3 +33,33 @@ func splitRepeat(repeat string) []string {
 
 	return lastSplit
 }
+
+func getMonthDays(days string) ([]int, error) {
+	splitedDays := strings.Split(days, ",")
+
+	var daysInt []int
+	for _, v := range splitedDays {
+		day, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, err
+		}
+		daysInt = append(daysInt, day)
+	}
+
+	return daysInt, nil
+}
+
+func getMonths(months string) ([]int, error) {
+	splitedMonths := strings.Split(months, ",")
+
+	var monthsInt []int
+	for _, v := range splitedMonths {
+		month, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, err
+		}
+		monthsInt = append(monthsInt, month)
+	}
+
+	return monthsInt, nil
+}

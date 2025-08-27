@@ -3,6 +3,7 @@ package nextdate
 import (
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -20,7 +21,9 @@ func countNextDate(now time.Time, dstartTime time.Time, repeat string) (time.Tim
 	case "y":
 		dstartTime, err = countForYOption(now, dstartTime)
 	case "w":
-		dstartTime, err = countForMOption(now, dstartTime, splitedRepeat)
+		dstartTime, err = countForWOption(dstartTime, splitedRepeat)
+	case "m":
+		dstartTime, err = countForMOption(dstartTime, repeat)
 	}
 
 	return dstartTime, err
@@ -47,7 +50,7 @@ func countForYOption(now time.Time, dstartTime time.Time) (time.Time, error) {
 	return dstartTime, nil
 }
 
-func countForMOption(now time.Time, dstartTime time.Time, splitedRepeat []string) (time.Time, error) {
+func countForWOption(dstartTime time.Time, splitedRepeat []string) (time.Time, error) {
 	choosedWeekDays, err := getWeekDays(splitedRepeat[1:])
 	if err != nil {
 		return time.Time{}, err
@@ -57,6 +60,25 @@ func countForMOption(now time.Time, dstartTime time.Time, splitedRepeat []string
 
 	for !slices.Contains(choosedWeekDays, int(dstartTime.Weekday())) {
 		dstartTime = dstartTime.AddDate(0, 0, 1)
+	}
+
+	return dstartTime, nil
+}
+
+func countForMOption(dstartTime time.Time, repeat string) (time.Time, error) {
+	parts := strings.Split(repeat, " ")
+
+	if len(parts) == 2 {
+		days, err := getMonthDays(parts[1])
+		if err != nil {
+			return time.Time{}, err
+		}
+
+		for !slices.Contains(days, dstartTime.Day()) {
+			dstartTime = dstartTime.AddDate(0, 0, 1)
+		}
+	} else if len(parts) == 3 {
+
 	}
 
 	return dstartTime, nil
