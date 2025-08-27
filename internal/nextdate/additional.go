@@ -45,6 +45,7 @@ func getMonthDays(days string) ([]int, error) {
 		}
 		daysInt = append(daysInt, day)
 	}
+	slices.Sort(daysInt)
 
 	return daysInt, nil
 }
@@ -60,6 +61,7 @@ func getMonths(months string) ([]int, error) {
 		}
 		monthsInt = append(monthsInt, month)
 	}
+	slices.Sort(monthsInt)
 
 	return monthsInt, nil
 }

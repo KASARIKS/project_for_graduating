@@ -78,7 +78,19 @@ func countForMOption(dstartTime time.Time, repeat string) (time.Time, error) {
 			dstartTime = dstartTime.AddDate(0, 0, 1)
 		}
 	} else if len(parts) == 3 {
+		months, err := getMonths(parts[2])
+		if err != nil {
+			return time.Time{}, err
+		}
 
+		days, err := getMonthDays(parts[1])
+		if err != nil {
+			return time.Time{}, err
+		}
+
+		for !slices.Contains(months, int(dstartTime.Month())) || !slices.Contains(days, dstartTime.Day()) {
+			dstartTime = dstartTime.AddDate(0, 0, 1)
+		}
 	}
 
 	return dstartTime, nil
