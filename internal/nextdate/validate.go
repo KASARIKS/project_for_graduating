@@ -47,7 +47,12 @@ func validateRepeatD(repeat string) error {
 	if len(splitedRepeat) != 2 {
 		return errors.New("unsupported format length for d option")
 	}
-	n, err := strconv.Atoi(splitedRepeat[1])
+
+	return validateNumbersForD(splitedRepeat[1])
+}
+
+func validateNumbersForD(number string) error {
+	n, err := strconv.Atoi(number)
 	if err != nil {
 		return errors.New("not numbers in repeat for d option")
 	}
@@ -72,8 +77,12 @@ func validateRepeatW(repeat string) error {
 	if len(splitedRepeat) < 2 {
 		return errors.New("unsupported format length for w option")
 	}
-	// Check for numbers
-	for _, v := range splitedRepeat[1:] {
+
+	return validateNumbersForW(splitedRepeat[1:])
+}
+
+func validateNumbersForW(numbers []string) error {
+	for _, v := range numbers {
 		n, err := strconv.Atoi(v)
 		if err != nil {
 			return errors.New("not numbers in repeat for w option")
@@ -94,7 +103,23 @@ func validateRepeatM(repeat string) error {
 
 	// Check for days numbers
 	days := strings.Split(splitedRepeatOnlySpaces[1], ",")
-	for _, v := range days {
+	if err := validateDaysNumbersForM(days); err != nil {
+		return err
+	}
+
+	// Check for months numbers
+	if len(splitedRepeatOnlySpaces) > 2 {
+		months := strings.Split(splitedRepeatOnlySpaces[2], ",")
+		if err := validateMonthNumbersForM(months); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func validateDaysNumbersForM(numbers []string) error {
+	for _, v := range numbers {
 		day, err := strconv.Atoi(v)
 		if err != nil {
 			return errors.New("not numbers in days in repeat for m option")
@@ -104,17 +129,17 @@ func validateRepeatM(repeat string) error {
 		}
 	}
 
-	// Check for months numbers
-	if len(splitedRepeatOnlySpaces) > 2 {
-		months := strings.Split(splitedRepeatOnlySpaces[2], ",")
-		for _, v := range months {
-			month, err := strconv.Atoi(v)
-			if err != nil {
-				return errors.New("not numbers in months in repeat for m option")
-			}
-			if month > 12 || month < 1 {
-				return errors.New("too big or too small numbers in months in repeat for m option")
-			}
+	return nil
+}
+
+func validateMonthNumbersForM(numbers []string) error {
+	for _, v := range numbers {
+		month, err := strconv.Atoi(v)
+		if err != nil {
+			return errors.New("not numbers in months in repeat for m option")
+		}
+		if month > 12 || month < 1 {
+			return errors.New("too big or too small numbers in months in repeat for m option")
 		}
 	}
 
