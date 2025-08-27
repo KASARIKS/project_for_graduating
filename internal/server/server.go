@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/handlers"
@@ -25,13 +26,13 @@ func initHandlers() {
 }
 
 func newRouterData(logger *log.Logger) *routerData {
-	// todoPort := ":" + os.Getenv("TODO_PORT")
-	// if todoPort == ":" {
-	// 	todoPort = ":7540"
-	// }
+	todoPort := ":" + os.Getenv("TODO_PORT")
+	if todoPort == ":" {
+		todoPort = ":7540"
+	}
 
 	server := &http.Server{
-		Addr:         ":8080", //todoPort,
+		Addr:         todoPort,
 		Handler:      http.DefaultServeMux,
 		ReadTimeout:  time.Second * 5,
 		WriteTimeout: time.Second * 5,
