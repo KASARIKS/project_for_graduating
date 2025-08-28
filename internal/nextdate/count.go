@@ -35,6 +35,8 @@ func countForDOption(now time.Time, dstartTime time.Time, splitedRepeat []string
 		return time.Time{}, err
 	}
 
+	dstartTime = dstartTime.AddDate(0, 0, daysQuantity)
+
 	for !dstartTime.After(now) {
 		dstartTime = dstartTime.AddDate(0, 0, daysQuantity)
 	}
@@ -43,6 +45,8 @@ func countForDOption(now time.Time, dstartTime time.Time, splitedRepeat []string
 }
 
 func countForYOption(now time.Time, dstartTime time.Time) (time.Time, error) {
+	dstartTime = dstartTime.AddDate(1, 0, 0)
+
 	for !dstartTime.After(now) {
 		dstartTime = dstartTime.AddDate(1, 0, 0)
 	}
