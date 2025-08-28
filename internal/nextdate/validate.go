@@ -110,7 +110,7 @@ func validateRepeatM(repeat string) error {
 	// Check for months numbers
 	if len(splitedRepeatOnlySpaces) > 2 {
 		months := strings.Split(splitedRepeatOnlySpaces[2], ",")
-		if err := validateMonthNumbersForM(months); err != nil {
+		if err := validateMonthNumbersForM(months, days); err != nil {
 			return err
 		}
 	}
@@ -118,8 +118,8 @@ func validateRepeatM(repeat string) error {
 	return nil
 }
 
-func validateDaysNumbersForM(numbers []string) error {
-	for _, v := range numbers {
+func validateDaysNumbersForM(days []string) error {
+	for _, v := range days {
 		day, err := strconv.Atoi(v)
 		if err != nil {
 			return errors.New("not numbers in days in repeat for m option")
@@ -132,8 +132,10 @@ func validateDaysNumbersForM(numbers []string) error {
 	return nil
 }
 
-func validateMonthNumbersForM(numbers []string) error {
-	for _, v := range numbers {
+func validateMonthNumbersForM(months, days []string) error {
+	countErrsForMaxMonthDays := 0
+
+	for _, v := range months {
 		month, err := strconv.Atoi(v)
 		if err != nil {
 			return errors.New("not numbers in months in repeat for m option")
@@ -141,7 +143,36 @@ func validateMonthNumbersForM(numbers []string) error {
 		if month > 12 || month < 1 {
 			return errors.New("too big or too small numbers in months in repeat for m option")
 		}
+
+		// For different months different days quantity
+		if err := validateDaysForMonth(month, days); err != nil {
+			countErrsForMaxMonthDays++
+
+			if countErrsForMaxMonthDays == len(months) {
+				return err
+			}
+		}
 	}
 
 	return nil
+}
+
+func validateDaysForMonth(month int, days []string) error {
+	for _, v := range days {
+		day, err := strconv.Atoi(v)
+		if err != nil {
+			return err
+		}
+		if day > getMonthMaxQuantityDays(month) {
+			return errors.New("too big value for month")
+		}
+	}
+
+	return nil
+}
+
+func getMonthMaxQuantityDays(month int) int {
+	months := []int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+
+	return months[month-1]
 }
