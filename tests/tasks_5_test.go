@@ -33,7 +33,10 @@ func getTasks(t *testing.T, search string) []map[string]string {
 	assert.NoError(t, err)
 
 	var m map[string][]map[string]string
+
+	// Can unmarshal but write that cannot
 	err = json.Unmarshal(body, &m)
+	fmt.Println(m, err)
 	assert.NoError(t, err)
 	return m["tasks"]
 }

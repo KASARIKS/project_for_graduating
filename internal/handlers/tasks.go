@@ -2,9 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
@@ -26,27 +24,23 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 			writeErrorInJson(w, err)
 			return
 		}
-	} else if len(strings.Replace(searchParam, " ", "", -1)) > 0 {
-		dbTasks, err = db.GetTasksByWord(50, searchParam)
-		if err != nil {
-			writeErrorInJson(w, err)
-			return
-		}
-		fmt.Println(len(dbTasks))
-	}
-
-	if len(dbTasks) == 0 {
-		t, err := time.Parse("02.01.2006", searchParam)
-		if err != nil {
-			writeErrorInJson(w, err)
-			return
-		}
+	} else if t, err := time.Parse("02.01.2006", searchParam); err == nil {
 		dbTime := t.Format(nextdate.DateFormat)
 		dbTasks, err = db.GetTasksByDate(50, dbTime)
 		if err != nil {
 			writeErrorInJson(w, err)
 			return
 		}
+	} else {
+		dbTasks, err = db.GetTasksByWord(50, searchParam)
+		if err != nil {
+			writeErrorInJson(w, err)
+			return
+		}
+	}
+
+	if len(dbTasks) == 0 {
+		dbTasks = []dbtask.DbTask{}
 	}
 
 	var tasks map[string][]dbtask.DbTask = map[string][]dbtask.DbTask{
