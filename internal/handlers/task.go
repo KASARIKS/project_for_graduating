@@ -13,29 +13,24 @@ import (
 )
 
 func Task(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("Content-Type") != "application/json" {
-		http.Error(w, errors.New("wrong request format").Error(), http.StatusBadRequest)
-		return
-	}
-
 	switch r.Method {
 	case http.MethodPost:
 		taskPost(w, r)
+		// case http.MethodGet:
+		// 	taskGet(w, r)
 	}
 }
 
 func taskPost(w http.ResponseWriter, r *http.Request) {
 	task, err := getTaskFromRequest(r)
 	if err != nil {
-		byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
-		w.Write(byteErr)
+		writeErrorInJson(w, err)
 		return
 	}
 
 	id, err := db.AddTask(task)
 	if err != nil {
-		byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
-		w.Write(byteErr)
+		writeErrorInJson(w, err)
 		return
 	}
 
@@ -43,8 +38,7 @@ func taskPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	byteId, err := json.Marshal(map[string]int64{"id": id})
 	if err != nil {
-		byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
-		w.Write(byteErr)
+		writeErrorInJson(w, err)
 		return
 	}
 
@@ -104,4 +98,14 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 	}
 
 	return task, nil
+}
+
+func taskGet(w http.ResponseWriter, r *http.Request) {
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	// dbTasks, err := db.GetTasks(50)
+	// if err != nil {
+	// 	writeErrorInJson(w, err)
+	// 	return
+	// }
 }

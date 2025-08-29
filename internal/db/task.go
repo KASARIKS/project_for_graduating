@@ -18,3 +18,24 @@ func AddTask(task *dbtask.DbTask) (int64, error) {
 
 	return id, err
 }
+
+func GetTasks(quantity int) ([]dbtask.DbTask, error) {
+	query := `SELECT * FROM scheduler LIMIT :quantity;`
+	rows, err := db.Query(query, sql.Named("quantity", quantity))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []dbtask.DbTask
+	for rows.Next() {
+		task := dbtask.DbTask{}
+		if err := rows.Scan(&task.Id, &task.Date, &task.Title, &task.Comment, &task.Repeat); err != nil {
+			return tasks, err
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}
