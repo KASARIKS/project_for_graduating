@@ -19,53 +19,68 @@ func Task(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
-		var task dbtask.DbTask
-		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+		taskPost(w, r)
+	}
+}
 
-		if task.Title == "" {
-			http.Error(w, errors.New("empty title").Error(), http.StatusBadRequest)
-			return
-		}
+func taskPost(w http.ResponseWriter, r *http.Request) {
+	task, err := getTaskFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-		// Validate task date
-		now := time.Now()
-		if task.Date == "" {
-			task.Date = now.Format(nextdate.DateFormat)
-		}
-		t, err := time.Parse("20060102", task.Date)
+	id, err := db.AddTask(task)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Send id into repsonse in json
+	if err := json.NewEncoder(w).Encode(id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func getTaskFromRequest(r *http.Request) (*dbtask.DbTask, error) {
+	var task dbtask.DbTask
+
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+		return nil, err
+	}
+
+	if task.Title == "" {
+		return nil, errors.New("empty title")
+	}
+
+	return filterTaskDate(&task)
+}
+
+func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
+	// Validate task date
+	now := time.Now()
+	if task.Date == "" {
+		task.Date = now.Format(nextdate.DateFormat)
+	}
+	t, err := time.Parse(nextdate.DateFormat, task.Date)
+	if err != nil {
+		return nil, errors.New("incorrect date")
+	}
+	if task.Repeat != "" {
+		next, err := nextdate.NextDate(now, task.Date, task.Repeat)
 		if err != nil {
-			http.Error(w, errors.New("incorrect date").Error(), http.StatusBadRequest)
-			return
+			return nil, err
 		}
-		if task.Repeat != "" {
-			next, err := nextdate.NextDate(now, task.Date, task.Repeat)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
+
+		if now.After(t) {
+			if len(task.Repeat) == 0 {
+				task.Date = now.Format(nextdate.DateFormat)
+			} else {
+				task.Date = next
 			}
-
-			if now.After(t) {
-				if len(task.Repeat) == 0 {
-					task.Date = now.Format(nextdate.DateFormat)
-				} else {
-					task.Date = next
-				}
-			}
-		}
-
-		id, err := db.AddTask(&task)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// Send id into repsonse in json
-		if err := json.NewEncoder(w).Encode(id); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 	}
+
+	return task, nil
 }
