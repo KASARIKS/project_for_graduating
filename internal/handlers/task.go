@@ -93,7 +93,7 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 		}
 
 		if now.After(t) {
-			if len(task.Repeat) == 0 {
+			if len(task.Repeat) == 0 || task.Repeat == "d 1" {
 				task.Date = now.Format(nextdate.DateFormat)
 			} else {
 				task.Date = next
