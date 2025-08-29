@@ -24,6 +24,7 @@ func initHandlers() {
 	http.Handle("/", http.FileServer(http.Dir("web")))
 	http.HandleFunc("/api/nextdate", handlers.GetNextDate)
 	http.HandleFunc("/api/task", handlers.Task)
+	http.HandleFunc("/api/tasks", handlers.GetTasks)
 }
 
 func newRouterData(logger *log.Logger) *routerData {

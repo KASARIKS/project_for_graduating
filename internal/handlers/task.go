@@ -16,8 +16,6 @@ func Task(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		taskPost(w, r)
-		// case http.MethodGet:
-		// 	taskGet(w, r)
 	}
 }
 
@@ -100,12 +98,28 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 	return task, nil
 }
 
-func taskGet(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+func GetTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	// dbTasks, err := db.GetTasks(50)
-	// if err != nil {
-	// 	writeErrorInJson(w, err)
-	// 	return
-	// }
+	dbTasks, err := db.GetTasks(50)
+	if err != nil {
+		writeErrorInJson(w, err)
+		return
+	}
+
+	var tasks map[string][]dbtask.DbTask = map[string][]dbtask.DbTask{
+		"tasks": dbTasks,
+	}
+
+	if tasks["tasks"] == nil {
+		tasks["tasks"] = []dbtask.DbTask{}
+	}
+
+	byteTasks, err := json.Marshal(tasks)
+	if err != nil {
+		writeErrorInJson(w, err)
+		return
+	}
+
+	w.Write(byteTasks)
 }
