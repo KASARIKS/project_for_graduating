@@ -21,21 +21,21 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	searchParam := r.URL.Query().Get("search")
 
 	if searchParam == "" {
-		fmt.Println("a " + searchParam)
 		dbTasks, err = db.GetTasks(50)
 		if err != nil {
 			writeErrorInJson(w, err)
 			return
 		}
 	} else if len(strings.Replace(searchParam, " ", "", -1)) > 0 {
-		fmt.Println("b " + fmt.Sprintf(".%s.", searchParam))
 		dbTasks, err = db.GetTasksByWord(50, searchParam)
 		if err != nil {
 			writeErrorInJson(w, err)
 			return
 		}
-	} else {
-		fmt.Println("c " + searchParam)
+		fmt.Println(len(dbTasks))
+	}
+
+	if len(dbTasks) == 0 {
 		t, err := time.Parse("02.01.2006", searchParam)
 		if err != nil {
 			writeErrorInJson(w, err)
