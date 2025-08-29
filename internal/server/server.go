@@ -23,6 +23,7 @@ func CreateServer(logger *log.Logger) (*routerData, error) {
 func initHandlers() {
 	http.Handle("/", http.FileServer(http.Dir("web")))
 	http.HandleFunc("/api/nextdate", handlers.GetNextDate)
+	http.HandleFunc("/api/task", handlers.Task)
 }
 
 func newRouterData(logger *log.Logger) *routerData {

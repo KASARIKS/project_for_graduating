@@ -10,7 +10,7 @@ import (
 const schema = "CREATE TABLE scheduler (" +
 	"id INTEGER PRIMARY KEY AUTOINCREMENT," +
 	"date CHAR(8) NOT NULL DEFAULT \"\"," +
-	"title VARCHAR(255) NOT NULL DEFAULT \"\"," +
+	"title VARCHAR(255) NOT NULL," +
 	"comment TEXT NOT NULL DEFAULT \"\"," +
 	"repeat VARCHAR(255) NOT NULL DEFAULT \"\"" +
 	");"

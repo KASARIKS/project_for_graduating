@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -26,31 +27,43 @@ func Task(w http.ResponseWriter, r *http.Request) {
 func taskPost(w http.ResponseWriter, r *http.Request) {
 	task, err := getTaskFromRequest(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
+		w.Write(byteErr)
 		return
 	}
 
 	id, err := db.AddTask(task)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
+		w.Write(byteErr)
 		return
 	}
 
 	// Send id into repsonse in json
-	if err := json.NewEncoder(w).Encode(id); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	byteId, err := json.Marshal(map[string]int64{"id": id})
+	if err != nil {
+		byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
+		w.Write(byteErr)
 		return
 	}
+
+	w.Write(byteId)
 }
 
 func getTaskFromRequest(r *http.Request) (*dbtask.DbTask, error) {
 	var task dbtask.DbTask
 
-	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+	var buf bytes.Buffer
+	if _, err := buf.ReadFrom(r.Body); err != nil {
 		return nil, err
 	}
 
-	if task.Title == "" {
+	if err := json.Unmarshal(buf.Bytes(), &task); err != nil {
+		return nil, err
+	}
+
+	if len(task.Title) == 0 {
 		return nil, errors.New("empty title")
 	}
 
@@ -60,14 +73,20 @@ func getTaskFromRequest(r *http.Request) (*dbtask.DbTask, error) {
 func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 	// Validate task date
 	now := time.Now()
-	if task.Date == "" {
+	if len(task.Date) == 0 {
 		task.Date = now.Format(nextdate.DateFormat)
 	}
 	t, err := time.Parse(nextdate.DateFormat, task.Date)
 	if err != nil {
 		return nil, errors.New("incorrect date")
 	}
-	if task.Repeat != "" {
+
+	// Date cannot be smaller than today's date
+	if now.After(t) {
+		task.Date = now.Format(nextdate.DateFormat)
+	}
+
+	if len(task.Repeat) != 0 {
 		next, err := nextdate.NextDate(now, task.Date, task.Repeat)
 		if err != nil {
 			return nil, err
@@ -79,6 +98,8 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 			} else {
 				task.Date = next
 			}
+		} else {
+			task.Date = now.Format(nextdate.DateFormat)
 		}
 	}
 

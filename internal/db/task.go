@@ -14,9 +14,7 @@ func AddTask(task *dbtask.DbTask) (int64, error) {
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat))
-	if err != nil {
-		id, err = res.LastInsertId()
-	}
+	id, err = res.LastInsertId()
 
 	return id, err
 }
