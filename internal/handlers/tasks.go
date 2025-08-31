@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
@@ -43,15 +44,32 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 		dbTasks = []dbtask.DbTask{}
 	}
 
-	var tasks map[string][]dbtask.DbTask = map[string][]dbtask.DbTask{
-		"tasks": dbTasks,
+	// var tasks map[string][]dbtask.DbTask = map[string][]dbtask.DbTask{
+	// 	"tasks": dbTasks,
+	// }
+
+	// if tasks["tasks"] == nil {
+	// 	tasks["tasks"] = []dbtask.DbTask{}
+	// }
+
+	// Convert to correct json type
+	var tasksMap map[string][]map[string]string = map[string][]map[string]string{}
+
+	for _, v := range dbTasks {
+		tasksMap["tasks"] = append(tasksMap["tasks"], map[string]string{
+			"id":      strconv.Itoa(v.Id),
+			"date":    v.Date,
+			"title":   v.Title,
+			"comment": v.Comment,
+			"repeat":  v.Repeat,
+		})
 	}
 
-	if tasks["tasks"] == nil {
-		tasks["tasks"] = []dbtask.DbTask{}
+	if tasksMap["tasks"] == nil {
+		tasksMap["tasks"] = []map[string]string{}
 	}
 
-	byteTasks, err := json.Marshal(tasks)
+	byteTasks, err := json.Marshal(tasksMap)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return
