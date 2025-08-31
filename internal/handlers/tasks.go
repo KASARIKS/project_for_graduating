@@ -44,15 +44,6 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 		dbTasks = []dbtask.DbTask{}
 	}
 
-	// var tasks map[string][]dbtask.DbTask = map[string][]dbtask.DbTask{
-	// 	"tasks": dbTasks,
-	// }
-
-	// if tasks["tasks"] == nil {
-	// 	tasks["tasks"] = []dbtask.DbTask{}
-	// }
-
-	// Convert to correct json type
 	var tasksMap map[string][]map[string]string = map[string][]map[string]string{}
 
 	for _, v := range dbTasks {

@@ -91,7 +91,7 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 				task.Date = next
 			}
 		} else {
-			task.Date = now.Format(nextdate.DateFormat)
+			task.Date = next
 		}
 	}
 

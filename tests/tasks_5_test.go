@@ -34,9 +34,7 @@ func getTasks(t *testing.T, search string) []map[string]string {
 
 	var m map[string][]map[string]string
 
-	// Can unmarshal but write that cannot
 	err = json.Unmarshal(body, &m)
-	fmt.Println(m, err)
 	assert.NoError(t, err)
 	return m["tasks"]
 }
@@ -59,6 +57,7 @@ func TestTasks(t *testing.T) {
 		comment: "с попкорном",
 		repeat:  "",
 	})
+
 	now = now.AddDate(0, 0, 1)
 	date := now.Format(`20060102`)
 	addTask(t, task{
