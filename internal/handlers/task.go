@@ -73,24 +73,15 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 		return nil, errors.New("incorrect date")
 	}
 
-	// Date cannot be smaller than today's date
 	if now.After(t) {
-		task.Date = now.Format(nextdate.DateFormat)
-	}
-
-	if len(task.Repeat) != 0 {
-		next, err := nextdate.NextDate(now, task.Date, task.Repeat)
-		if err != nil {
-			return nil, err
-		}
-
-		if now.After(t) {
-			if len(task.Repeat) == 0 || task.Repeat == "d 1" {
-				task.Date = now.Format(nextdate.DateFormat)
-			} else {
-				task.Date = next
-			}
+		if len(task.Repeat) == 0 || task.Repeat == "d 1" {
+			task.Date = now.Format(nextdate.DateFormat)
 		} else {
+			next, err := nextdate.NextDate(now, task.Date, task.Repeat)
+			if err != nil {
+				return nil, err
+			}
+
 			task.Date = next
 		}
 	}
