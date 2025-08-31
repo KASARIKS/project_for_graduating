@@ -1,9 +1,7 @@
-package handlers
+package taskhandlers
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
@@ -16,27 +14,42 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	var dbTasks []dbtask.DbTask
 	var err error
 
-	// Choose search method
 	searchParam := r.URL.Query().Get("search")
+
+	dbTasks, err = getTasksFromDbBySearch(searchParam)
+	if err != nil {
+		writeErrorInJson(w, err)
+		return
+	}
+
+	byteTasks, err := getJsonFromTasks(dbTasks)
+	if err != nil {
+		writeErrorInJson(w, err)
+		return
+	}
+
+	w.Write(byteTasks)
+}
+
+func getTasksFromDbBySearch(searchParam string) ([]dbtask.DbTask, error) {
+	var dbTasks []dbtask.DbTask
+	var err error
 
 	if searchParam == "" {
 		dbTasks, err = db.GetTasks(50)
 		if err != nil {
-			writeErrorInJson(w, err)
-			return
+			return dbTasks, err
 		}
 	} else if t, err := time.Parse("02.01.2006", searchParam); err == nil {
 		dbTime := t.Format(nextdate.DateFormat)
 		dbTasks, err = db.GetTasksByDate(50, dbTime)
 		if err != nil {
-			writeErrorInJson(w, err)
-			return
+			return dbTasks, err
 		}
 	} else {
 		dbTasks, err = db.GetTasksByWord(50, searchParam)
 		if err != nil {
-			writeErrorInJson(w, err)
-			return
+			return dbTasks, err
 		}
 	}
 
@@ -44,27 +57,5 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 		dbTasks = []dbtask.DbTask{}
 	}
 
-	var tasksMap map[string][]map[string]string = map[string][]map[string]string{}
-
-	for _, v := range dbTasks {
-		tasksMap["tasks"] = append(tasksMap["tasks"], map[string]string{
-			"id":      strconv.Itoa(v.Id),
-			"date":    v.Date,
-			"title":   v.Title,
-			"comment": v.Comment,
-			"repeat":  v.Repeat,
-		})
-	}
-
-	if tasksMap["tasks"] == nil {
-		tasksMap["tasks"] = []map[string]string{}
-	}
-
-	byteTasks, err := json.Marshal(tasksMap)
-	if err != nil {
-		writeErrorInJson(w, err)
-		return
-	}
-
-	w.Write(byteTasks)
+	return dbTasks, err
 }

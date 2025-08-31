@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/handlers"
+	"github.com/kasariks/project_for_graduating/internal/handlers/taskhandlers"
 )
 
 type routerData struct {
@@ -23,8 +24,8 @@ func CreateServer(logger *log.Logger) (*routerData, error) {
 func initHandlers() {
 	http.Handle("/", http.FileServer(http.Dir("web")))
 	http.HandleFunc("/api/nextdate", handlers.GetNextDate)
-	http.HandleFunc("/api/task", handlers.Task)
-	http.HandleFunc("/api/tasks", handlers.GetTasks)
+	http.HandleFunc("/api/task", taskhandlers.Task)
+	http.HandleFunc("/api/tasks", taskhandlers.GetTasks)
 }
 
 func newRouterData(logger *log.Logger) *routerData {

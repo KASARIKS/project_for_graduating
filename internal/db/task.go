@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 
 	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
 )
@@ -21,4 +22,37 @@ func AddTask(task *dbtask.DbTask) (int64, error) {
 	id, err = res.LastInsertId()
 
 	return id, err
+}
+
+func GetTaskById(id int) (*dbtask.DbTask, error) {
+	var dbTask dbtask.DbTask
+	query := `SELECT * FROM scheduler WHERE id = :id;`
+	row := db.QueryRow(query, sql.Named("id", id))
+	err := row.Scan(&dbTask.Id, &dbTask.Date, &dbTask.Title, &dbTask.Comment, &dbTask.Repeat)
+
+	return &dbTask, err
+}
+
+func UpdateTask(dbtask *dbtask.DbTask) error {
+	query := `UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id;`
+	res, err := db.Exec(query,
+		sql.Named("date", dbtask.Date),
+		sql.Named("title", dbtask.Title),
+		sql.Named("comment", dbtask.Comment),
+		sql.Named("repeat", dbtask.Repeat),
+		sql.Named("id", dbtask.Id),
+	)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+
+	return nil
 }

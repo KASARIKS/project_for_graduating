@@ -1,4 +1,4 @@
-package handlers
+package taskhandlers
 
 import (
 	"bytes"
@@ -12,14 +12,8 @@ import (
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
-func Task(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		taskPost(w, r)
-	}
-}
-
 func taskPost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	task, err := getTaskFromRequest(r)
 	if err != nil {
 		writeErrorInJson(w, err)
@@ -33,7 +27,6 @@ func taskPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send id into repsonse in json
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	byteId, err := json.Marshal(map[string]int64{"id": id})
 	if err != nil {
 		writeErrorInJson(w, err)
@@ -68,6 +61,7 @@ func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
 	if len(task.Date) == 0 {
 		task.Date = now.Format(nextdate.DateFormat)
 	}
+
 	t, err := time.Parse(nextdate.DateFormat, task.Date)
 	if err != nil {
 		return nil, errors.New("incorrect date")

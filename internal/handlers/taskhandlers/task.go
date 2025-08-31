@@ -1,0 +1,16 @@
+package taskhandlers
+
+import (
+	"net/http"
+)
+
+func Task(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		taskPost(w, r)
+	case http.MethodGet:
+		taskGet(w, r)
+	case http.MethodPut:
+		taskPut(w, r)
+	}
+}
