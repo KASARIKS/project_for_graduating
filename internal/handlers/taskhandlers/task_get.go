@@ -34,11 +34,8 @@ func taskGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	byteTask, err := json.Marshal(dbTask)
-	if err != nil {
+	if err = json.NewEncoder(w).Encode(dbTask); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
-
-	w.Write(byteTask)
 }

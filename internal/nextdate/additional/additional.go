@@ -1,4 +1,4 @@
-package nextdate
+package additional_nextdate
 
 import (
 	"slices"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func getWeekDays(splitedWeekDays []string) ([]int, error) {
+func GetWeekDays(splitedWeekDays []string) ([]int, error) {
 	var choosedWeekDays []int
 	for _, v := range splitedWeekDays {
 		day, err := strconv.Atoi(v)
@@ -23,7 +23,7 @@ func getWeekDays(splitedWeekDays []string) ([]int, error) {
 	return choosedWeekDays, nil
 }
 
-func splitRepeat(repeat string) []string {
+func SplitRepeat(repeat string) []string {
 	firstSplit := strings.Split(repeat, " ")
 	lastSplit := []string{}
 
@@ -34,7 +34,7 @@ func splitRepeat(repeat string) []string {
 	return lastSplit
 }
 
-func getMonthDays(days string) ([]int, error) {
+func ConvertMonthDays(days string) ([]int, error) {
 	splitedDays := strings.Split(days, ",")
 
 	var daysInt []int
@@ -50,7 +50,7 @@ func getMonthDays(days string) ([]int, error) {
 	return daysInt, nil
 }
 
-func getMonths(months string) ([]int, error) {
+func ConvertMonths(months string) ([]int, error) {
 	splitedMonths := strings.Split(months, ",")
 
 	var monthsInt []int

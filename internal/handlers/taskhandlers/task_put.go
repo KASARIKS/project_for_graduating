@@ -62,11 +62,8 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	byteResp, err := json.Marshal(map[string]string{})
-	if err != nil {
+	if err = json.NewEncoder(w).Encode(map[string]string{}); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
-
-	w.Write(byteResp)
 }

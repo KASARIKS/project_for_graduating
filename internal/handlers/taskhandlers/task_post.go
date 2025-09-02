@@ -1,7 +1,6 @@
 package taskhandlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -27,24 +26,16 @@ func taskPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send id into repsonse in json
-	byteId, err := json.Marshal(map[string]int64{"id": id})
-	if err != nil {
+	if err = json.NewEncoder(w).Encode(map[string]int64{"id": id}); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
-
-	w.Write(byteId)
 }
 
 func getTaskFromRequest(r *http.Request) (*dbtask.DbTask, error) {
 	var task dbtask.DbTask
 
-	var buf bytes.Buffer
-	if _, err := buf.ReadFrom(r.Body); err != nil {
-		return nil, err
-	}
-
-	if err := json.Unmarshal(buf.Bytes(), &task); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		return nil, err
 	}
 
