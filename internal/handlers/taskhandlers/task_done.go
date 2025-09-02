@@ -2,58 +2,60 @@ package taskhandlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
+	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
 func TaskDone(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if len(id) == 0 {
-		writeErrorInJson(w, errors.New("no identifier"))
-		return
-	}
-
-	intId, err := strconv.Atoi(id)
+	id, err := getIdentifier(r)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
 
-	task, err := db.GetTaskById(intId)
-	if err != nil {
+	if err := writeTask(id); err != nil {
 		writeErrorInJson(w, err)
 		return
-	}
-
-	if len(task.Repeat) == 0 {
-		if err := db.DeleteTask(intId); err != nil {
-			writeErrorInJson(w, err)
-			return
-		}
-	} else {
-		now := time.Now()
-
-		next, err := nextdate.NextDate(now, task.Date, task.Repeat)
-		if err != nil {
-			writeErrorInJson(w, err)
-			return
-		}
-
-		task.Date = next
-
-		if err := db.UpdateTask(task); err != nil {
-			writeErrorInJson(w, err)
-			return
-		}
 	}
 
 	if err = json.NewEncoder(w).Encode(map[string]string{}); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
+}
+
+func writeTask(id int) error {
+	task, err := db.GetTaskById(id)
+	if err != nil {
+		return err
+	}
+
+	return changeTaskDateOrDelete(task, id)
+}
+
+func changeTaskDateOrDelete(task *dbtask.DbTask, id int) error {
+	if len(task.Repeat) == 0 {
+		if err := db.DeleteTask(id); err != nil {
+			return err
+		}
+	} else {
+		now := time.Now()
+
+		next, err := nextdate.NextDate(now, task.Date, task.Repeat)
+		if err != nil {
+			return err
+		}
+
+		task.Date = next
+
+		if err := db.UpdateTask(task); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

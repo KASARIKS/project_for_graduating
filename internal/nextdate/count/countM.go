@@ -19,18 +19,7 @@ func CountForMOption(now time.Time, dstartTime time.Time, repeat string) (time.T
 
 		dstartTime = addDays(now, dstartTime, 1)
 
-		minusDays := getMinusDays(days)
-		for !slices.Contains(days, dstartTime.Day()) {
-			dstartTime = dstartTime.AddDate(0, 0, 1)
-
-			t := time.Date(dstartTime.Year(), dstartTime.Month(), 32, 0, 0, 0, 0, time.UTC)
-			daysInMonth := 32 - t.Day()
-
-			reverseDays := getDaysByMinusDays(minusDays, daysInMonth)
-			if slices.Contains(reverseDays, dstartTime.Day()) {
-				break
-			}
-		}
+		dstartTime = theClosestDstart(days, nil, dstartTime)
 	} else if len(parts) == 3 {
 		months, err := additional_nextdate.ConvertMonths(parts[2])
 		if err != nil {
@@ -44,12 +33,28 @@ func CountForMOption(now time.Time, dstartTime time.Time, repeat string) (time.T
 
 		dstartTime = addDays(now, dstartTime, 1)
 
-		for !slices.Contains(months, int(dstartTime.Month())) || !slices.Contains(days, dstartTime.Day()) {
-			dstartTime = dstartTime.AddDate(0, 0, 1)
-		}
+		dstartTime = theClosestDstart(days, months, dstartTime)
 	}
 
 	return dstartTime, nil
+}
+
+func theClosestDstart(days, months []int, dstartTime time.Time) time.Time {
+	minusDays := getMinusDays(days)
+
+	for monthContain(months, dstartTime) || !slices.Contains(days, dstartTime.Day()) {
+		dstartTime = dstartTime.AddDate(0, 0, 1)
+
+		t := time.Date(dstartTime.Year(), dstartTime.Month(), 32, 0, 0, 0, 0, time.UTC)
+		daysInMonth := 32 - t.Day()
+
+		reverseDays := getDaysByMinusDays(minusDays, daysInMonth)
+		if slices.Contains(reverseDays, dstartTime.Day()) {
+			break
+		}
+	}
+
+	return dstartTime
 }
 
 func getMinusDays(days []int) []int {
@@ -61,6 +66,14 @@ func getMinusDays(days []int) []int {
 	}
 
 	return minusDays
+}
+
+func monthContain(months []int, dstartTime time.Time) bool {
+	if months == nil {
+		return false
+	}
+
+	return !slices.Contains(months, int(dstartTime.Month()))
 }
 
 func getDaysByMinusDays(minusDays []int, daysInMonth int) []int {

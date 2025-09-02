@@ -2,7 +2,6 @@ package taskhandlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -10,13 +9,7 @@ import (
 )
 
 func taskGet(w http.ResponseWriter, r *http.Request) {
-	getId := r.URL.Query().Get("id")
-	if len(getId) == 0 {
-		writeErrorInJson(w, errors.New("identifier not specified"))
-		return
-	}
-
-	id, err := strconv.Atoi(getId)
+	id, err := getIdentifier(r)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return

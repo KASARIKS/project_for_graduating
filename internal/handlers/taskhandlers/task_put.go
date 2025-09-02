@@ -2,10 +2,7 @@ package taskhandlers
 
 import (
 	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
@@ -18,46 +15,27 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 	var dbTask dbtask.DbTask
 
 	// Get task from request
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		writeErrorInJson(w, err)
-		return
-	}
-
-	err = json.Unmarshal(body, &dbTask)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&dbTask); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
 
 	// Validate task
-	_, err = strconv.Atoi(dbTask.Id)
-	if err != nil {
+	if err := validateTask(dbTask); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
 
-	if len(dbTask.Title) == 0 {
-		writeErrorInJson(w, errors.New("empty title"))
-		return
-	}
-
-	_, err = time.Parse(nextdate.DateFormat, dbTask.Date)
-	if err != nil {
-		writeErrorInJson(w, errors.New("incorrect date"))
-		return
-	}
-
+	// NOT IN "validateTask" CAUSE BY MISTERY REASON RUIN TEST IF NOT HERE
 	now := time.Now()
-	_, err = nextdate.NextDate(now, dbTask.Date, dbTask.Repeat)
+	_, err := nextdate.NextDate(now, dbTask.Date, dbTask.Repeat)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
 
 	// Update task
-	err = db.UpdateTask(&dbTask)
-	if err != nil {
+	if err := db.UpdateTask(&dbTask); err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
