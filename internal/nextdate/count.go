@@ -21,9 +21,9 @@ func countNextDate(now time.Time, dstartTime time.Time, repeat string) (time.Tim
 	case "y":
 		dstartTime, err = countForYOption(now, dstartTime)
 	case "w":
-		dstartTime, err = countForWOption(dstartTime, splitedRepeat)
+		dstartTime, err = countForWOption(now, dstartTime, splitedRepeat)
 	case "m":
-		dstartTime, err = countForMOption(dstartTime, repeat)
+		dstartTime, err = countForMOption(now, dstartTime, repeat)
 	}
 
 	return dstartTime, err
@@ -54,13 +54,16 @@ func countForYOption(now time.Time, dstartTime time.Time) (time.Time, error) {
 	return dstartTime, nil
 }
 
-func countForWOption(dstartTime time.Time, splitedRepeat []string) (time.Time, error) {
+func countForWOption(now time.Time, dstartTime time.Time, splitedRepeat []string) (time.Time, error) {
 	choosedWeekDays, err := getWeekDays(splitedRepeat[1:])
 	if err != nil {
 		return time.Time{}, err
 	}
 
 	dstartTime = dstartTime.AddDate(0, 0, 1)
+	for !dstartTime.After(now) {
+		dstartTime = dstartTime.AddDate(0, 0, 1)
+	}
 
 	for !slices.Contains(choosedWeekDays, int(dstartTime.Weekday())) {
 		dstartTime = dstartTime.AddDate(0, 0, 1)
@@ -69,7 +72,7 @@ func countForWOption(dstartTime time.Time, splitedRepeat []string) (time.Time, e
 	return dstartTime, nil
 }
 
-func countForMOption(dstartTime time.Time, repeat string) (time.Time, error) {
+func countForMOption(now time.Time, dstartTime time.Time, repeat string) (time.Time, error) {
 	parts := strings.Split(repeat, " ")
 
 	if len(parts) == 2 {
@@ -78,8 +81,22 @@ func countForMOption(dstartTime time.Time, repeat string) (time.Time, error) {
 			return time.Time{}, err
 		}
 
+		dstartTime = dstartTime.AddDate(0, 0, 1)
+		for !dstartTime.After(now) {
+			dstartTime = dstartTime.AddDate(0, 0, 1)
+		}
+
+		minusDays := getMinusDays(days)
 		for !slices.Contains(days, dstartTime.Day()) {
 			dstartTime = dstartTime.AddDate(0, 0, 1)
+
+			t := time.Date(dstartTime.Year(), dstartTime.Month(), 32, 0, 0, 0, 0, time.UTC)
+			daysInMonth := 32 - t.Day()
+
+			reverseDays := getDaysByMinusDays(minusDays, daysInMonth)
+			if slices.Contains(reverseDays, dstartTime.Day()) {
+				break
+			}
 		}
 	} else if len(parts) == 3 {
 		months, err := getMonths(parts[2])
@@ -92,10 +109,35 @@ func countForMOption(dstartTime time.Time, repeat string) (time.Time, error) {
 			return time.Time{}, err
 		}
 
+		dstartTime = dstartTime.AddDate(0, 0, 1)
+		for !dstartTime.After(now) {
+			dstartTime = dstartTime.AddDate(0, 0, 1)
+		}
+
 		for !slices.Contains(months, int(dstartTime.Month())) || !slices.Contains(days, dstartTime.Day()) {
 			dstartTime = dstartTime.AddDate(0, 0, 1)
 		}
 	}
 
 	return dstartTime, nil
+}
+
+func getMinusDays(days []int) []int {
+	minusDays := []int{}
+	for _, v := range days {
+		if v < 0 {
+			minusDays = append(minusDays, v)
+		}
+	}
+
+	return minusDays
+}
+
+func getDaysByMinusDays(minusDays []int, daysInMonth int) []int {
+	days := []int{}
+	for _, v := range minusDays {
+		days = append(days, daysInMonth+(v+1))
+	}
+
+	return days
 }

@@ -124,7 +124,7 @@ func validateDaysNumbersForM(days []string) error {
 		if err != nil {
 			return errors.New("not numbers in days in repeat for m option")
 		}
-		if day > 31 || day < -31 {
+		if day > 31 || (day < 1 && day != -1 && day != -2 && day != -31) {
 			return errors.New("too big or too small numbers in days in repeat for m option")
 		}
 	}
