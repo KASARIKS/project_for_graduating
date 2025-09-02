@@ -26,6 +26,7 @@ func initHandlers() {
 	http.HandleFunc("/api/nextdate", handlers.GetNextDate)
 	http.HandleFunc("/api/task", taskhandlers.Task)
 	http.HandleFunc("/api/tasks", taskhandlers.GetTasks)
+	http.HandleFunc("/api/task/done", taskhandlers.TaskDone)
 }
 
 func newRouterData(logger *log.Logger) *routerData {

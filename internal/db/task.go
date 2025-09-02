@@ -56,3 +56,10 @@ func UpdateTask(dbtask *dbtask.DbTask) error {
 
 	return nil
 }
+
+func DeleteTask(id int) error {
+	query := `DELETE FROM scheduler WHERE id = :id;`
+	_, err := db.Exec(query, sql.Named("id", id))
+
+	return err
+}
