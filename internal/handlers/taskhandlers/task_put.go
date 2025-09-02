@@ -24,25 +24,18 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var taskMap map[string]string
-
-	err = json.Unmarshal(body, &taskMap)
+	err = json.Unmarshal(body, &dbTask)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
 
 	// Validate task
-	id, err := strconv.Atoi(taskMap["id"])
+	_, err = strconv.Atoi(dbTask.Id)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return
 	}
-	dbTask.Id = id
-	dbTask.Date = taskMap["date"]
-	dbTask.Title = taskMap["title"]
-	dbTask.Comment = taskMap["comment"]
-	dbTask.Repeat = taskMap["repeat"]
 
 	if len(dbTask.Title) == 0 {
 		writeErrorInJson(w, errors.New("empty title"))
@@ -61,20 +54,6 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 		writeErrorInJson(w, err)
 		return
 	}
-
-	// if now.After(t) {
-	// 	if len(dbTask.Repeat) == 0 || dbTask.Repeat == "d 1" {
-	// 		dbTask.Date = now.Format(nextdate.DateFormat)
-	// 	} else {
-	// 		next, err := nextdate.NextDate(now, dbTask.Date, dbTask.Repeat)
-	// 		if err != nil {
-	// 			writeErrorInJson(w, err)
-	// 			return
-	// 		}
-
-	// 		dbTask.Date = next
-	// 	}
-	// }
 
 	// Update task
 	err = db.UpdateTask(&dbTask)

@@ -3,7 +3,6 @@ package taskhandlers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
 )
@@ -18,7 +17,7 @@ func getJsonFromTasks(dbTasks []dbtask.DbTask) ([]byte, error) {
 
 	for _, v := range dbTasks {
 		tasksMap["tasks"] = append(tasksMap["tasks"], map[string]string{
-			"id":      strconv.Itoa(v.Id),
+			"id":      v.Id,
 			"date":    v.Date,
 			"title":   v.Title,
 			"comment": v.Comment,

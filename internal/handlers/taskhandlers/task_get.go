@@ -28,15 +28,13 @@ func taskGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var mapTask map[string]string = map[string]string{
-		"id":      strconv.Itoa(dbTask.Id),
-		"date":    dbTask.Date,
-		"title":   dbTask.Title,
-		"comment": dbTask.Comment,
-		"repeat":  dbTask.Repeat,
+	_, err = strconv.Atoi(dbTask.Id)
+	if err != nil {
+		writeErrorInJson(w, err)
+		return
 	}
 
-	byteTask, err := json.Marshal(mapTask)
+	byteTask, err := json.Marshal(dbTask)
 	if err != nil {
 		writeErrorInJson(w, err)
 		return
