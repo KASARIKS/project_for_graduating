@@ -24,9 +24,10 @@ func CreateServer(logger *log.Logger) (*routerData, error) {
 func initHandlers() {
 	http.Handle("/", http.FileServer(http.Dir("web")))
 	http.HandleFunc("/api/nextdate", handlers.GetNextDate)
-	http.HandleFunc("/api/task", taskhandlers.Task)
+	http.HandleFunc("/api/task", handlers.Auth(taskhandlers.Task))
 	http.HandleFunc("/api/tasks", taskhandlers.GetTasks)
-	http.HandleFunc("/api/task/done", taskhandlers.TaskDone)
+	http.HandleFunc("/api/task/done", handlers.Auth(taskhandlers.TaskDone))
+	http.HandleFunc("/api/signin", handlers.SignIn)
 }
 
 func newRouterData(logger *log.Logger) *routerData {
