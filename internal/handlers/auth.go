@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	jsonwebtoken "github.com/golang-jwt/jwt/v5"
+	envsettings "github.com/kasariks/project_for_graduating/internal/env_settings"
+	"github.com/kasariks/project_for_graduating/tests"
 )
 
 const jwtKey = "334dfasdfqewrqwerqwerdkp123afv"
@@ -16,7 +17,7 @@ const jwtKey = "334dfasdfqewrqwerqwerdkp123afv"
 func Auth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// смотрим наличие пароля
-		pass := os.Getenv("TODO_PASSWORD")
+		pass := envsettings.Env.Password
 		if len(pass) > 0 {
 			var jwt string // JWT-токен из куки
 			// получаем куку
@@ -56,7 +57,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if pass["password"] == os.Getenv("TODO_PASSWORD") {
+	if pass["password"] == envsettings.Env.Password {
 		claims := jwt.MapClaims{
 			"exp": time.Now().Add(time.Minute * 15).Unix(),
 		}
@@ -85,6 +86,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 			writeErrorInJson(w, err)
 			return
 		}
+		tests.Token = signedToken
 	} else {
 		writeErrorInJson(w, errors.New("wrong password"))
 		return

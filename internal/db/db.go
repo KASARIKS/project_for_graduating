@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 
+	envsettings "github.com/kasariks/project_for_graduating/internal/env_settings"
 	_ "modernc.org/sqlite"
 )
 
@@ -18,7 +19,7 @@ const schema = "CREATE TABLE scheduler (" +
 var db *sql.DB
 
 func Init(dbFiles string) error {
-	dbFile := os.Getenv("TODO_DBFILE")
+	dbFile := envsettings.Env.DbPath
 	if dbFile == "" {
 		dbFile = "scheduler.db"
 	}
@@ -42,4 +43,8 @@ func Init(dbFiles string) error {
 	}
 
 	return nil
+}
+
+func Close() error {
+	return db.Close()
 }

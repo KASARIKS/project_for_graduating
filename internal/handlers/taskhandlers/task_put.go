@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
 func taskPut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	var dbTask dbtask.DbTask
+	var dbTask dbtask.Task
 
 	// Get task from request
 	if err := json.NewDecoder(r.Body).Decode(&dbTask); err != nil {

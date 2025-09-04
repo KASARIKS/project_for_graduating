@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 )
 
 func writeErrorInJson(w http.ResponseWriter, err error) {
@@ -12,7 +12,7 @@ func writeErrorInJson(w http.ResponseWriter, err error) {
 	w.Write(byteErr)
 }
 
-func getJsonFromTasks(dbTasks []dbtask.DbTask) ([]byte, error) {
+func getJsonFromTasks(dbTasks []dbtask.Task) ([]byte, error) {
 	var tasksMap map[string][]map[string]string = map[string][]map[string]string{}
 
 	for _, v := range dbTasks {

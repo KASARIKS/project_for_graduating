@@ -3,9 +3,9 @@ package server
 import (
 	"log"
 	"net/http"
-	"os"
 	"time"
 
+	envsettings "github.com/kasariks/project_for_graduating/internal/env_settings"
 	"github.com/kasariks/project_for_graduating/internal/handlers"
 	"github.com/kasariks/project_for_graduating/internal/handlers/taskhandlers"
 )
@@ -31,7 +31,7 @@ func initHandlers() {
 }
 
 func newRouterData(logger *log.Logger) *routerData {
-	todoPort := ":" + os.Getenv("TODO_PORT")
+	todoPort := envsettings.Env.Port
 	if todoPort == ":" {
 		todoPort = ":7540"
 	}

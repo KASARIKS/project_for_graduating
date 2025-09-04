@@ -1,6 +1,6 @@
-package dbtask
+package db_task
 
-type DbTask struct {
+type Task struct {
 	Id      string `json:"id"`
 	Date    string `json:"date"`
 	Title   string `json:"title"`

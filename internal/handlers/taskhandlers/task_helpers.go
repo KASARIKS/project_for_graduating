@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
@@ -21,7 +21,7 @@ func getIdentifier(r *http.Request) (int, error) {
 	return intId, err
 }
 
-func validateTask(dbTask dbtask.DbTask) error {
+func validateTask(dbTask dbtask.Task) error {
 	_, err := strconv.Atoi(dbTask.Id)
 	if err != nil {
 		return err

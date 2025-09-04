@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 )
 
-func AddTask(task *dbtask.DbTask) (int64, error) {
+func AddTask(task *dbtask.Task) (int64, error) {
 	var id int64
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat);`
 	res, err := db.Exec(query,
@@ -24,16 +24,16 @@ func AddTask(task *dbtask.DbTask) (int64, error) {
 	return id, err
 }
 
-func GetTaskById(id int) (*dbtask.DbTask, error) {
-	var dbTask dbtask.DbTask
-	query := `SELECT * FROM scheduler WHERE id = :id;`
+func GetTaskById(id int) (*dbtask.Task, error) {
+	var dbTask dbtask.Task
+	query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = :id;`
 	row := db.QueryRow(query, sql.Named("id", id))
 	err := row.Scan(&dbTask.Id, &dbTask.Date, &dbTask.Title, &dbTask.Comment, &dbTask.Repeat)
 
 	return &dbTask, err
 }
 
-func UpdateTask(dbtask *dbtask.DbTask) error {
+func UpdateTask(dbtask *dbtask.Task) error {
 	query := `UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id;`
 	res, err := db.Exec(query,
 		sql.Named("date", dbtask.Date),

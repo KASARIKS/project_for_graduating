@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
 func GetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	var dbTasks []dbtask.DbTask
+	var dbTasks []dbtask.Task
 	var err error
 
 	searchParam := r.URL.Query().Get("search")
@@ -31,8 +31,8 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Write(byteTasks)
 }
 
-func getTasksFromDbBySearch(searchParam string) ([]dbtask.DbTask, error) {
-	var dbTasks []dbtask.DbTask
+func getTasksFromDbBySearch(searchParam string) ([]dbtask.Task, error) {
+	var dbTasks []dbtask.Task
 	var err error
 
 	if searchParam == "" {
@@ -54,7 +54,7 @@ func getTasksFromDbBySearch(searchParam string) ([]dbtask.DbTask, error) {
 	}
 
 	if len(dbTasks) == 0 {
-		dbTasks = []dbtask.DbTask{}
+		dbTasks = []dbtask.Task{}
 	}
 
 	return dbTasks, err

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
@@ -37,7 +37,7 @@ func writeTask(id int) error {
 	return changeTaskDateOrDelete(task, id)
 }
 
-func changeTaskDateOrDelete(task *dbtask.DbTask, id int) error {
+func changeTaskDateOrDelete(task *dbtask.Task, id int) error {
 	if len(task.Repeat) == 0 {
 		if err := db.DeleteTask(id); err != nil {
 			return err

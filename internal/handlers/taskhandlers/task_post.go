@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kasariks/project_for_graduating/internal/db"
-	dbtask "github.com/kasariks/project_for_graduating/internal/db/dbEntites/dbTask"
+	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 	"github.com/kasariks/project_for_graduating/internal/nextdate"
 )
 
@@ -32,8 +32,8 @@ func taskPost(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getTaskFromRequest(r *http.Request) (*dbtask.DbTask, error) {
-	var task dbtask.DbTask
+func getTaskFromRequest(r *http.Request) (*dbtask.Task, error) {
+	var task dbtask.Task
 
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func getTaskFromRequest(r *http.Request) (*dbtask.DbTask, error) {
 	return filterTaskDate(&task)
 }
 
-func filterTaskDate(task *dbtask.DbTask) (*dbtask.DbTask, error) {
+func filterTaskDate(task *dbtask.Task) (*dbtask.Task, error) {
 	// Validate task date
 	now := time.Now()
 	if len(task.Date) == 0 {
