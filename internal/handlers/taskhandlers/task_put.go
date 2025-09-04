@@ -16,13 +16,13 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 
 	// Get task from request
 	if err := json.NewDecoder(r.Body).Decode(&dbTask); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	// Validate task
 	if err := validateTask(dbTask); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -30,18 +30,18 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	_, err := nextdate.NextDate(now, dbTask.Date, dbTask.Repeat)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	// Update task
 	if err := db.UpdateTask(&dbTask); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err = json.NewEncoder(w).Encode(map[string]string{}); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusInternalServerError)
 		return
 	}
 }

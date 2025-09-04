@@ -53,7 +53,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	pass := map[string]string{}
 	err := json.NewDecoder(r.Body).Decode(&pass)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -65,7 +65,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 		signedToken, err := jwtToken.SignedString([]byte(jwtKey))
 		if err != nil {
-			writeErrorInJson(w, err)
+			writeErrorInJson(w, err, http.StatusBadRequest)
 			return
 		}
 
@@ -83,17 +83,22 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 			"token": signedToken,
 		})
 		if err != nil {
-			writeErrorInJson(w, err)
+			writeErrorInJson(w, err, http.StatusInternalServerError)
 			return
 		}
 		tests.Token = signedToken
 	} else {
-		writeErrorInJson(w, errors.New("wrong password"))
+		writeErrorInJson(w, errors.New("wrong password"), http.StatusBadRequest)
 		return
 	}
 }
 
-func writeErrorInJson(w http.ResponseWriter, err error) {
-	byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
+func writeErrorInJson(w http.ResponseWriter, err error, status int) {
+	byteErr, err := json.Marshal(map[string]string{"error": err.Error()})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+	w.WriteHeader(status)
 	w.Write(byteErr)
 }

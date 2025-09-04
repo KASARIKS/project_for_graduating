@@ -15,19 +15,19 @@ func taskPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	task, err := getTaskFromRequest(r)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	id, err := db.AddTask(task)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	// Send id into repsonse in json
 	if err = json.NewEncoder(w).Encode(map[string]int64{"id": id}); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusInternalServerError)
 		return
 	}
 }

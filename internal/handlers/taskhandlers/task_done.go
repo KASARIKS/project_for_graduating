@@ -13,17 +13,17 @@ import (
 func TaskDone(w http.ResponseWriter, r *http.Request) {
 	id, err := getIdentifier(r)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := writeTask(id); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err = json.NewEncoder(w).Encode(map[string]string{}); err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusInternalServerError)
 		return
 	}
 }

@@ -18,13 +18,13 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 
 	dbTasks, err = getTasksFromDbBySearch(searchParam)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 
 	byteTasks, err := getJsonFromTasks(dbTasks)
 	if err != nil {
-		writeErrorInJson(w, err)
+		writeErrorInJson(w, err, http.StatusBadRequest)
 		return
 	}
 

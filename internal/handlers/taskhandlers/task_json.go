@@ -7,8 +7,13 @@ import (
 	dbtask "github.com/kasariks/project_for_graduating/internal/dbEntites/db_task"
 )
 
-func writeErrorInJson(w http.ResponseWriter, err error) {
-	byteErr, _ := json.Marshal(map[string]string{"error": err.Error()})
+func writeErrorInJson(w http.ResponseWriter, err error, status int) {
+	byteErr, err := json.Marshal(map[string]string{"error": err.Error()})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+	w.WriteHeader(status)
 	w.Write(byteErr)
 }
 
