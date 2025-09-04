@@ -1,4 +1,4 @@
-package additional_nextdate
+package nextdate
 
 import (
 	"slices"
