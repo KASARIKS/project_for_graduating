@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"io"
 	"net/http"
 	"time"
 
@@ -21,5 +20,5 @@ func GetNextDate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	io.WriteString(w, finalDate)
+	w.Write([]byte(finalDate))
 }

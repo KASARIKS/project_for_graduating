@@ -8,13 +8,12 @@ import (
 )
 
 func writeErrorInJson(w http.ResponseWriter, err error, status int) {
-	byteErr, err := json.Marshal(map[string]string{"error": err.Error()})
+	w.WriteHeader(status)
+	err = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}
-	w.WriteHeader(status)
-	w.Write(byteErr)
 }
 
 func getJsonFromTasks(dbTasks []dbtask.Task) ([]byte, error) {

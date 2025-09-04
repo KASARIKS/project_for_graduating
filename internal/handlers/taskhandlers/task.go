@@ -1,6 +1,7 @@
 package taskhandlers
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -14,5 +15,7 @@ func Task(w http.ResponseWriter, r *http.Request) {
 		taskPut(w, r)
 	case http.MethodDelete:
 		taskDelete(w, r)
+	default:
+		writeErrorInJson(w, errors.New("wrong method"), http.StatusBadRequest)
 	}
 }
