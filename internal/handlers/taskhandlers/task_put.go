@@ -40,7 +40,7 @@ func taskPut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = json.NewEncoder(w).Encode(map[string]string{}); err != nil {
+	if err := json.NewEncoder(w).Encode(map[string]string{}); err != nil {
 		writeErrorInJson(w, err, http.StatusInternalServerError)
 		return
 	}

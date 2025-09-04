@@ -31,23 +31,25 @@ func GetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Write(byteTasks)
 }
 
+const maxTasks = 50
+
 func getTasksFromDbBySearch(searchParam string) ([]dbtask.Task, error) {
 	var dbTasks []dbtask.Task
 	var err error
 
 	if searchParam == "" {
-		dbTasks, err = db.GetTasks(50)
+		dbTasks, err = db.GetTasks(maxTasks)
 		if err != nil {
 			return dbTasks, err
 		}
 	} else if t, err := time.Parse("02.01.2006", searchParam); err == nil {
 		dbTime := t.Format(nextdate.DateFormat)
-		dbTasks, err = db.GetTasksByDate(50, dbTime)
+		dbTasks, err = db.GetTasksByDate(maxTasks, dbTime)
 		if err != nil {
 			return dbTasks, err
 		}
 	} else {
-		dbTasks, err = db.GetTasksByWord(50, searchParam)
+		dbTasks, err = db.GetTasksByWord(maxTasks, searchParam)
 		if err != nil {
 			return dbTasks, err
 		}
